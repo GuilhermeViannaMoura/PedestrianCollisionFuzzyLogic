@@ -8,36 +8,55 @@ yi=0; yf=1;
 xi=0; xf=10;
 
 % Plotagem da janela
-title('Simulador'); % VAI DEPENDER DO MODELO ESCOLHIDO
-xlabel('Tempo');
-ylabel('Risco de Colisão');
 xlim([0 10]); % TROCAR PRA 100?
 ylim([0 1]);
 Axis = ([xi xf yi yf]);
 plot([xi xf xf xi xi],[yi yi yf yf yi]);
 hold on; % usado sempre para manter o que já foi desenhado no gráfico
 
-% Variaveis para plotagem do robo na parede lateral esquerda (posicao inicial)
-r = 0.1;      % Raio do robo
-xc = r;     % Abscissa do robo igual ao raio para que ele parta colado a parede
-%yc = 0.5;    % receber do usuário
-%plot_circle(xc,yc,r,'k'); % primeiro plot em preto pois ainda não foi calculado o risco de colisao
-%hold on;
-%plot_circle(xc+10,yc,r,'r');
-%hold on;
+t = 0; %tempo
 
 fprintf('##########################\n');
 fprintf('#### RISCO DE COLISÃO ####\n');
-fprintf('##########################\n \n'); % FAZER VARIOS MODELOS ONDE CADA UM IRA ALTERAR DE FORMA DIFERENTE UMA VARIAVEL COM O TEMPO(EX: CARRO ACELERANDO OU DESACELERANDO)
-fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
-VelocidadePedestre = input('Velocidade do pedestre no intervalo 0 <= x <= 6\n-> ');
-VelocidadeCarro = input('Velocidade do carro no intervalo 0 <= x <= 150\n-> ');
-Angulo = input('Angulo no intervalo 0 <= x <= 180\n-> ');
-DistanciaRelativa = input('Distancia Relativa inicial no intervalo 0 <= x <= 70\n-> ');
+fprintf('##########################\n \n');
 
+fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
+VelocidadePedestre = input('Velocidade do pedestre  0 <= x <= 6\n-> ');
+VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
+Angulo = input('Angulo  0 <= x <= 180\n-> ');
+%DistanciaRelativa = input('Distancia Relativa inicial  0 <= x <= 70\n-> ');
+DistanciaRelativa = 100;
 inputs = [VelocidadePedestre;Angulo;VelocidadeCarro;DistanciaRelativa];
-RiscoColisao = evalfis(fis,inputs);
-cor = 'ro'; % DEPENDE DO OUTPUT
-plot(1,RiscoColisao,cor);
-%plot_circle(xc,RiscoColisao,r,'r');
-hold on;
+
+opcao = 1;
+switch opcao
+    case 1 % GRAFICO
+        title('Gráfico Tempo x RiscoDeColisão');
+        xlabel('Tempo');
+        ylabel('Risco de Colisão');
+        hold on;
+        for i=0:100
+            plot_risco(t,fis,inputs);
+            t = t + 0.1;
+            DistanciaRelativa = DistanciaRelativa - 1;
+            inputs = [VelocidadePedestre;Angulo;VelocidadeCarro;DistanciaRelativa];
+        end
+    case 2 % SIMULADOR
+        title('Simulador');
+        %FAZER SIMULADOR DO CARRO TOMANDO DECISAO A PARTIR DO MODELO FUZZY
+end
+
+function plot_risco(passo,f,in)
+    RiscoColisao = evalfis(f,in);
+    if RiscoColisao < 0.25
+        cor = 'go';
+    end
+    if RiscoColisao >= 0.25 && RiscoColisao <= 0.75
+        cor = 'yo';
+    end
+    if RiscoColisao > 0.75
+        cor = 'ro';
+    end
+    plot(passo,RiscoColisao,cor);
+    hold on;
+end
