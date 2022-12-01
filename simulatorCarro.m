@@ -2,13 +2,14 @@ close all
 clear all
 
 fis = readfis('desvio.fis');
+fis2 = readfis('risco.fis');
 
 % Tamanho da janela
 yi=0; yf=100;
 xi=0; xf=300;
 
 % Plotagem da janela
-xlim([0 xf]); % TROCAR PRA 100?
+xlim([0 xf]);
 ylim([0 yf]);
 Axis = ([xi xf yi yf]);
 plot([xi xf xf xi xi],[yi yi yf yf yi]);
@@ -19,17 +20,16 @@ xl = [xi,xf];
 plot(xl,[60,60],'k');
 plot(xl,[50,50],'k--');
 plot(xl,[40,40],'k');
-%plot(xl,[30,30],'k');
 
-t = 0; %tempo
+%t = 0; %tempo
 
 fprintf('##########################\n');
-fprintf('#### RISCO DE COLISÃO ####\n');
+fprintf('#### EVITANDO COLISÃO ####\n');
 fprintf('##########################\n \n');
 
 fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
 %VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
-xp = input('Posicao x inicial do pedestre 0 <= x <= 300\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
+xp = input('Posicao x inicial do pedestre 0 <= x <= 300\n-> ');
 pistaP = input('Em qual pista o pedestre está? esquerda(1) ou direita(2)\n-> ');
 pistaC = input('Em qual pista o carro está? esquerda(1) ou direita(2)\n-> ');
 if pistaP == 1
@@ -48,7 +48,7 @@ else
 end
 %yp = 50; % y inicial do pedestre
 xc = 0;  % x inicial do carro
-%yc = 55; % y inicial do carro (pista da direita)
+%yc = 55; % y inicial do carro
 
 DistanciaRelativa = xp - xc;
 DistanciaLateral = yc - yp;
@@ -56,7 +56,7 @@ inputs = [DistanciaRelativa,DistanciaLateral,yc];
 
 opcao = 2; % FAZER INPUT
 switch opcao
-    case 1 % GRAFICO DO OUTPUT (CONSERTAR PARA FUNCIONAR COM desvio.fis)
+    case 1 % GRAFICO DO OUTPUT (NAO TA FUNCIONANDO)
         title('Gráfico Tempo x RiscoDeColisão');
         xlabel('Tempo');
         ylabel('Risco de Colisão');
@@ -64,7 +64,7 @@ switch opcao
         DistanciaRelativa = xp - xc;
         inputs = [VelocidadeCarro;DistanciaRelativa];
         for i=0:xf
-            plot_risco(i,fis,inputs);
+            plot_risco(i,fis2,inputs);
             %t = t + 1;
             DistanciaRelativa = DistanciaRelativa - 1;
             inputs = [VelocidadeCarro;DistanciaRelativa];
@@ -82,26 +82,22 @@ switch opcao
             if DistanciaRelativa > 0
                 inputs = [DistanciaRelativa,DistanciaLateral,yc];
                 desvio = evalfis(fis,inputs);
-                yc = yc + desvio;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                if yc >= 55
-                    yc = 55;
-                end
-                if yc <= 45
-                    yc = 45;
-                end
-                plot_carro(xc,yc);
-                hold on;
-            else % PASSAR A CONSIDERAR O OBSTACULO SEGUINTE AQUI
-                yc = yc - 0.1;
-                if yc <= 45
-                    yc = 45;
-                end
-                plot_carro(xc,yc);
-                hold on;
+                yc = yc + desvio;
+            else % volta para posicao original dps de ultrapassar o obstaculo
+                inputs = [abs(DistanciaRelativa),DistanciaLateral,yc];
+                desvio = evalfis(fis,inputs);
+                yc = yc - desvio;
             end
-        end
-        
 
+            if yc >= 55
+                yc = 55;
+            end
+            if yc <= 45
+                yc = 45;
+            end
+            plot_carro(xc,yc);
+            hold on;
+        end
 end
 
 function plot_risco(passo,f,in)

@@ -29,8 +29,8 @@ fprintf('##########################\n \n');
 
 fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
 %VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
-xp = input('Posicao x inicial do pedestre 0 <= x <= 100\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
-pistaP = input('Em qual pista o obstáculo está? esquerda(1) ou direita(2)\n-> ');
+xp = input('Posicao x inicial do pedestre 0 <= x <= 300\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
+pistaP = input('Em qual pista o pedestre está? esquerda(1) ou direita(2)\n-> ');
 pistaC = input('Em qual pista o carro está? esquerda(1) ou direita(2)\n-> ');
 if pistaP == 1
     yp = 55;
@@ -40,9 +40,9 @@ else
     fprintf('Escolha uma opção válida.');
 end
 if pistaC == 1
-    yp = 55;
-elseif pistaP == 2
-    yp = 45;
+    yc = 55;
+elseif pistaC == 2
+    yc = 45;
 else
     fprintf('Escolha uma opção válida.');
 end
@@ -83,22 +83,32 @@ switch opcao
                 inputs = [DistanciaRelativa,DistanciaLateral,yc];
                 desvio = evalfis(fis,inputs);
                 yc = yc + desvio;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                if yc >= 55
-                    yc = 55;
-                end
-                if yc <= 45
-                    yc = 45;
-                end
-                plot_carro(xc,yc);
-                hold on;
-            else % PASSAR A CONSIDERAR O OBSTACULO SEGUINTE AQUI
-                yc = yc - 0.1;
-                if yc <= 45
-                    yc = 45;
-                end
-                plot_carro(xc,yc);
-                hold on;
+                %if yc >= 55
+                %    yc = 55;
+                %end
+                %if yc <= 45
+                %    yc = 45;
+                %end
+                %plot_carro(xc,yc);
+                %hold on;
+            else %%%%%%%%%%%%%%%%%%%%%%%%%
+                
+                %yc = yc - 0.1;
+                %if yc <= 45
+                %    yc = 45;
+                %end
+                %plot_carro(xc,yc);
+                %hold on;
             end
+
+            if yc >= 55
+                yc = 55;
+            end
+            if yc <= 45
+                yc = 45;
+            end
+            plot_carro(xc,yc);
+            hold on;
         end
         
 
