@@ -1,24 +1,25 @@
 close all
 clear all
 
-fis = readfis('risco.fis');
+fis = readfis('desvio.fis');
 
 % Tamanho da janela
-yi=0; yf=1;
-xi=0; xf=100;
+yi=0; yf=100;
+xi=0; xf=300;
 
 % Plotagem da janela
-xlim([0 100]); % TROCAR PRA 100?
-ylim([0 1]);
+xlim([0 xf]); % TROCAR PRA 100?
+ylim([0 yf]);
 Axis = ([xi xf yi yf]);
 plot([xi xf xf xi xi],[yi yi yf yf yi]);
 hold on; % usado sempre para manter o que já foi desenhado no gráfico
 
 % Plotagem dos limites da rua
 xl = [xi,xf];
-plot(xl,[0.4,0.4],'k');
-plot(xl,[0.6,0.6],'k');
-plot(xl,[0.5,0.5],'k--');
+plot(xl,[60,60],'k');
+plot(xl,[50,50],'k--');
+plot(xl,[40,40],'k');
+%plot(xl,[30,30],'k');
 
 t = 0; %tempo
 
@@ -27,23 +28,42 @@ fprintf('#### RISCO DE COLISÃO ####\n');
 fprintf('##########################\n \n');
 
 fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
-VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
-xp = input('Posicao x inicial do pedestre 0 <= x <= 100\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
-yp = 0.45;
-xc = 0;   % x inicial do carro
-yc = 0.45; % y inicial do carro (faixa da direita)
+%VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
+xp = input('Posicao x inicial do pedestre 0 <= x <= 300\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
+pistaP = input('Em qual pista o pedestre está? esquerda(1) ou direita(2)\n-> ');
+pistaC = input('Em qual pista o carro está? esquerda(1) ou direita(2)\n-> ');
+if pistaP == 1
+    yp = 55;
+elseif pistaP == 2
+    yp = 45;
+else
+    fprintf('Escolha uma opção válida.');
+end
+if pistaC == 1
+    yc = 55;
+elseif pistaC == 2
+    yc = 45;
+else
+    fprintf('Escolha uma opção válida.');
+end
+%yp = 50; % y inicial do pedestre
+xc = 0;  % x inicial do carro
+%yc = 55; % y inicial do carro (pista da direita)
 
 DistanciaRelativa = xp - xc;
-inputs = [VelocidadeCarro;DistanciaRelativa];
+DistanciaLateral = yc - yp;
+inputs = [DistanciaRelativa,DistanciaLateral,yc];
 
 opcao = 2; % FAZER INPUT
 switch opcao
-    case 1 % GRAFICO
+    case 1 % GRAFICO DO OUTPUT (CONSERTAR PARA FUNCIONAR COM desvio.fis)
         title('Gráfico Tempo x RiscoDeColisão');
         xlabel('Tempo');
         ylabel('Risco de Colisão');
         hold on;
-        for i=0:100
+        DistanciaRelativa = xp - xc;
+        inputs = [VelocidadeCarro;DistanciaRelativa];
+        for i=0:xf
             plot_risco(i,fis,inputs);
             %t = t + 1;
             DistanciaRelativa = DistanciaRelativa - 1;
@@ -52,26 +72,29 @@ switch opcao
     case 2 % SIMULADOR
         title('Simulador');
         plot_pedestre(xp,yp);
-        for i=0:100
+        for i=0:xf
             xc = xc + 1;
+            if xc > xf
+                xc = xf; % corrige um bug que mostrava alguns pontos dps do fim do gráfico
+            end
             DistanciaRelativa = xp - xc;
+            DistanciaLateral = yc - yp;
             if DistanciaRelativa > 0
-                inputs = [VelocidadeCarro;DistanciaRelativa];
-                RiscoColisao = evalfis(fis,inputs);
-                if RiscoColisao >= 0.35 && RiscoColisao <= 0.75
-                    yc = yc + 0.005; % AJUSTAR ESSE VALOR
-                elseif RiscoColisao > 0.75
-                    yc = yc + 0.01;
+                inputs = [DistanciaRelativa,DistanciaLateral,yc];
+                desvio = evalfis(fis,inputs);
+                yc = yc + desvio;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                if yc >= 55
+                    yc = 55;
                 end
-                if yc >= 0.55
-                    yc = 0.55;
+                if yc <= 45
+                    yc = 45;
                 end
                 plot_carro(xc,yc);
                 hold on;
-            else
-                yc = yc - 0.005;
-                if yc <= 0.45
-                    yc = 0.45;
+            else % PASSAR A CONSIDERAR O OBSTACULO SEGUINTE AQUI
+                yc = yc - 0.1;
+                if yc <= 45
+                    yc = 45;
                 end
                 plot_carro(xc,yc);
                 hold on;
