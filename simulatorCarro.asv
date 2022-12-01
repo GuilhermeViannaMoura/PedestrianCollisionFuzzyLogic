@@ -14,6 +14,9 @@ Axis = ([xi xf yi yf]);
 plot([xi xf xf xi xi],[yi yi yf yf yi]);
 hold on; % usado sempre para manter o que já foi desenhado no gráfico
 
+xl = [xi,xf];
+yl = [0.4,0.6]
+
 t = 0; %tempo
 
 fprintf('##########################\n');
@@ -22,7 +25,7 @@ fprintf('##########################\n \n');
 
 %fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
 VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
-xp = input('Posicao x inicial do pedestre 0 <= x <= 100\n->'); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
+xp = input('Posicao x inicial do pedestre 0 <= x <= 100\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
 yp = 0.45;
 xc = 0;   % x inicial do carro
 yc = 0.45; % y inicial do carro (faixa da direita)
@@ -47,27 +50,26 @@ switch opcao
         title('Simulador');
         plot_pedestre(xp,yp);
         for i=0:100
-            
-            xc = xc + i;
+            xc = xc + 1;
             DistanciaRelativa = xp - xc;
             if DistanciaRelativa > 0
                 inputs = [VelocidadeCarro;DistanciaRelativa];
                 RiscoColisao = evalfis(fis,inputs);
-                if RiscoColisao >= 0.25 && RiscoColisao <= 0.75
-                    yc = yc + 0.05; % AJUSTAR ESSE VALOR
-                    if yc >= 0.6
-                        yc = 0.6;
-                    end
+                if RiscoColisao >= 0.35 && RiscoColisao <= 0.75
+                    yc = yc + 0.005; % AJUSTAR ESSE VALOR
                 elseif RiscoColisao > 0.75
-                    yc = yc + 0.1;
+                    yc = yc + 0.01;
                 end
-                if yc >= 0.6
-                    yc = 0.6;
+                if yc >= 0.55
+                    yc = 0.55;
                 end
                 plot_carro(xc,yc);
-                hold on; %mostra rastro do carro
+                hold on;
             else
-                yc = yc - 0.05;
+                yc = yc - 0.005;
+                if yc <= 0.45
+                    yc = 0.45;
+                end
                 plot_carro(xc,yc);
                 hold on;
             end

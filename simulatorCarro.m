@@ -14,13 +14,19 @@ Axis = ([xi xf yi yf]);
 plot([xi xf xf xi xi],[yi yi yf yf yi]);
 hold on; % usado sempre para manter o que já foi desenhado no gráfico
 
+% Plotagem dos limites da rua
+xl = [xi,xf];
+plot(xl,[0.4,0.4],'k');
+plot(xl,[0.6,0.6],'k');
+plot(xl,[0.5,0.5],'k--');
+
 t = 0; %tempo
 
 fprintf('##########################\n');
 fprintf('#### RISCO DE COLISÃO ####\n');
 fprintf('##########################\n \n');
 
-%fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
+fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
 VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
 xp = input('Posicao x inicial do pedestre 0 <= x <= 100\n-> '); % ADICIONAR OPCAO PARA MAIS PEDESTRES SE DER TEMPO
 yp = 0.45;
