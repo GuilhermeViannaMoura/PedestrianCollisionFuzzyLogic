@@ -1,5 +1,6 @@
 close all
 clear all
+warning off all
 
 fis = readfis('desvio.fis');
 fis2 = readfis('risco.fis');
@@ -21,14 +22,11 @@ plot(xl,[60,60],'k');
 plot(xl,[50,50],'k--');
 plot(xl,[40,40],'k');
 
-%t = 0; %tempo
-
 fprintf('##########################\n');
 fprintf('#### EVITANDO COLISÃO ####\n');
 fprintf('##########################\n \n');
 
 fprintf('DEFINA AS VARIÁVEIS INICIAIS:\n');
-%VelocidadeCarro = input('Velocidade do carro  0 <= x <= 150\n-> ');
 xp = input('Posicao x inicial do pedestre 0 <= x <= 300\n-> ');
 pistaP = input('Em qual pista o pedestre está? esquerda(1) ou direita(2)\n-> ');
 pistaC = input('Em qual pista o carro está? esquerda(1) ou direita(2)\n-> ');
@@ -56,7 +54,7 @@ inputs = [DistanciaRelativa,DistanciaLateral,yc];
 
 opcao = 2; % FAZER INPUT
 switch opcao
-    case 1 % GRAFICO DO OUTPUT (NAO TA FUNCIONANDO)
+    case 1 % GRAFICO DO OUTPUT (######### NAO EXECUTAR #########)
         title('Gráfico Tempo x RiscoDeColisão');
         xlabel('Tempo');
         ylabel('Risco de Colisão');
@@ -65,7 +63,6 @@ switch opcao
         inputs = [VelocidadeCarro;DistanciaRelativa];
         for i=0:xf
             plot_risco(i,fis2,inputs);
-            %t = t + 1;
             DistanciaRelativa = DistanciaRelativa - 1;
             inputs = [VelocidadeCarro;DistanciaRelativa];
         end
